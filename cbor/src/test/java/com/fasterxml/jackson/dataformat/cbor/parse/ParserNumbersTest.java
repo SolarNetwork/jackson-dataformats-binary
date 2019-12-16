@@ -361,4 +361,21 @@ public class ParserNumbersTest extends CBORTestBase
             assertNull(parser.nextToken());
         }
     }
+
+    public void testBigDecimalType3() throws IOException {
+        // Maintain backwards compatibility with < v2.10 where generated CBOR
+        // affected by [dataformats#139]
+        final byte[] spec = new byte[] {
+                (byte) 0xC4,  // tag 4
+                (byte) 0x82,  // Array of length 2
+                0x02,  // int -- 2 (should have been 0x21 for -2)
+                0x19, 0x6a, (byte) 0xb3 // int 27315
+        };
+        try (CBORParser parser = cborParser(spec)) {
+            assertEquals(JsonToken.VALUE_NUMBER_FLOAT, parser.nextToken());
+            assertEquals(NumberType.BIG_DECIMAL, parser.getNumberType());
+            assertEquals(new BigDecimal("273.15"), parser.getDecimalValue());
+            assertNull(parser.nextToken());
+        }
+    }
 }

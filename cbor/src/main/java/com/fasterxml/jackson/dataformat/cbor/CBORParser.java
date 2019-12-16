@@ -882,7 +882,11 @@ public class CBORParser extends ParserMinimalBase
             _reportError("Unexpected token ("+currentToken()+") as the first part of 'bigfloat' value: should get VALUE_NUMBER_INT");
         }
         // 27-Nov-2019, tatu: As per [dataformats-binary#139] need to change sign here
-        int exp = -getIntValue();
+        //                    if decoding CBOR generated < v2.10
+        int exp = getIntValue();
+        if ( exp < 0 ) {
+          exp = -exp;
+        }
 
         // Should get an integer value; int/long/BigInteger
         if (!_checkNextIsIntInArray("bigfloat")) {
