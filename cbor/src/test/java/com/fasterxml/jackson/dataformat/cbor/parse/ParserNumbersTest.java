@@ -335,7 +335,9 @@ public class ParserNumbersTest extends CBORTestBase
         generator.close();
 
         final byte[] b = out.toByteArray();
-        try (CBORParser parser = cborParser(b)) {
+        CBORFactory f = new CBORFactory();
+        f.enable(CBORParser.Feature.CBOR_BIG_DECIMAL_EXPONENT_NEGATE);
+        try (CBORParser parser = cborParser(f, b)) {
             assertEquals(JsonToken.VALUE_NUMBER_FLOAT, parser.nextToken());
             assertEquals(NumberType.BIG_DECIMAL, parser.getNumberType());
             assertEquals(NR, parser.getDecimalValue());
@@ -354,7 +356,9 @@ public class ParserNumbersTest extends CBORTestBase
                 0x21,  // int -- -2
                 0x19, 0x6a, (byte) 0xb3 // int 27315
         };
-        try (CBORParser parser = cborParser(spec)) {
+        CBORFactory f = new CBORFactory();
+        f.enable(CBORParser.Feature.CBOR_BIG_DECIMAL_EXPONENT_NEGATE);
+        try (CBORParser parser = cborParser(f, spec)) {
             assertEquals(JsonToken.VALUE_NUMBER_FLOAT, parser.nextToken());
             assertEquals(NumberType.BIG_DECIMAL, parser.getNumberType());
             assertEquals(new BigDecimal("273.15"), parser.getDecimalValue());

@@ -24,8 +24,15 @@ public class CBORParser extends ParserMinimalBase
      */
     public enum Feature implements FormatFeature
     {
-//        BOGUS(false)
-        ;
+      /**
+       * Feature that can be eanbled to negate a typed array BigDecimal.
+       *<p>
+       * Default provides compatibility with {@code CBORGenerator} from < v2.10.
+       *
+       * @since 2.10.1.SNF
+       */
+      CBOR_BIG_DECIMAL_EXPONENT_NEGATE(false),
+      ;
 
         final boolean _defaultState;
         final int _mask;
@@ -73,6 +80,12 @@ public class CBORParser extends ParserMinimalBase
      * Codec used for data binding when (if) requested.
      */
     protected ObjectCodec _objectCodec;
+    
+    /**
+     * Toggle backwards-compatibility with < v2.10 typed array
+     * BigDecimal handling.
+     */
+    final private boolean _bigDecimalNegate;
 
     /*
     /**********************************************************
@@ -366,6 +379,8 @@ public class CBORParser extends ParserMinimalBase
 
         _tokenInputRow = -1;
         _tokenInputCol = -1;
+        
+        _bigDecimalNegate = Feature.CBOR_BIG_DECIMAL_EXPONENT_NEGATE.enabledIn(cborFeatures);
     }
 
     @Override
@@ -884,7 +899,7 @@ public class CBORParser extends ParserMinimalBase
         // 27-Nov-2019, tatu: As per [dataformats-binary#139] need to change sign here
         //                    if decoding CBOR generated < v2.10
         int exp = getIntValue();
-        if ( exp < 0 ) {
+        if ( _bigDecimalNegate ) {
           exp = -exp;
         }
 

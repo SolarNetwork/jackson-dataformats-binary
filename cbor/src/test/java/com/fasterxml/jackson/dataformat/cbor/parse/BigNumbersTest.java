@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import com.fasterxml.jackson.dataformat.cbor.CBORGenerator;
 import com.fasterxml.jackson.dataformat.cbor.CBORParser;
 import com.fasterxml.jackson.dataformat.cbor.CBORTestBase;
@@ -20,10 +21,8 @@ public class BigNumbersTest extends CBORTestBase
         _testBigDecimal(BigDecimal.ONE.scaleByPowerOfTen(-1));
         _testBigDecimal(BigDecimal.ONE.scaleByPowerOfTen(-3));
         _testBigDecimal(BigDecimal.ONE.scaleByPowerOfTen(-100));
-        /* Disabled for SNF patch
         _testBigDecimal(BigDecimal.ONE.scaleByPowerOfTen(3));
         _testBigDecimal(BigDecimal.ONE.scaleByPowerOfTen(137));
-        */
 
         _testBigDecimal(new BigDecimal("0.01"));
         _testBigDecimal(new BigDecimal("0.33"));
@@ -56,7 +55,9 @@ public class BigNumbersTest extends CBORTestBase
         byte[] b = sourceBytes.toByteArray();
         
         // but verify that the original content can be parsed
-        CBORParser parser = cborParser(b);
+        final CBORFactory f = new CBORFactory();
+        f.enable(CBORParser.Feature.CBOR_BIG_DECIMAL_EXPONENT_NEGATE);
+        CBORParser parser = cborParser(f, b);
         assertToken(JsonToken.START_OBJECT, parser.nextToken());
         assertToken(JsonToken.FIELD_NAME, parser.nextToken());
         assertEquals("a", parser.getCurrentName());
