@@ -25,7 +25,7 @@ public class CBORParser extends ParserMinimalBase
     public enum Feature implements FormatFeature
     {
       /**
-       * Feature that can be eanbled to negate a typed array BigDecimal.
+       * Feature that can be enabled to negate a typed array BigDecimal.
        *<p>
        * Default provides compatibility with {@code CBORGenerator} from < v2.10.
        *
